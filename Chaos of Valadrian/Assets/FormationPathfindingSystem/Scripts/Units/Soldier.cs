@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Soldier : BaseUnit
 {
     public Soldier friend;
@@ -10,7 +11,7 @@ public class Soldier : BaseUnit
     public BaseChoice choice;
     public Group group;
 
-    public bool charge = false;
+    public bool inCombat = false;
     // public Transform[] rayCastPositions;
     // public float raycastDistance;
     // public float raycastDistanceForward;

@@ -10,8 +10,16 @@ public class SaveFriendChoice : BaseChoice
     public float friendHPMultiplier = 1;
     public override void Action(Soldier _soldier)
     {
-        _soldier.attackTarget = _soldier.friend.attackTarget;
-        _soldier.MoveTowards(_soldier.attackTarget.transform.position);
+        if (_soldier.inCombat)
+        {
+            _soldier.attackTarget = _soldier.friend.attackTarget;
+            _soldier.MoveTowards(_soldier.attackTarget.transform.position);
+        }
+        else
+        {
+            _soldier.MoveTowards(_soldier.formationTarget.transform.position);
+        }
+
         //Ik wil hier de code voor het helpen van de vriend
     }
 

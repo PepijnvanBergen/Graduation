@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Sirenix.Utilities;
 
 public abstract class BaseFormation : MonoBehaviour
 {
@@ -9,35 +11,16 @@ public abstract class BaseFormation : MonoBehaviour
     //public BaseUnit leader;
     public float thicknessDistance = 2;
     public GameObject formationMasterPF;
-    public GameObject formationMaster;
+    //public GameObject formationMaster;
     
     public Transform startPos;
     public Transform endPos;
-
-    // public void FilterLeader()
-    // {
-    //     foreach (BaseUnit bu in units)
-    //     {
-    //         if (bu == leader)
-    //         {
-    //             units.Remove(bu);
-    //             return;
-    //         }
-    //     }
-    // }
-
+    public formationType thisFormation;
     public virtual void StartFormation(Group _group) //abstract 
     {
-        
     }
-    public virtual void MoveFormation(Group _group, Transform _newTransform)
+    public virtual void MoveFormation(Group _group, Vector3 _firstPoint, Vector3 _secondPoint)
     {
-        _group.formationMaster.transform.position = _newTransform.position;
-        _group.formationMaster.transform.rotation = _newTransform.rotation;
-    }
-    public virtual void ResizeFormation()
-    {
-        //Hier ervoor zorgen dat je de units loskoppelt van de formatie, dan de formatie opnieuw maken en dan de units de dichtbijzijnste plek claimen
     }
     public Vector3 GetMidPoint(Transform _startPos, Transform _endPos)
     {
@@ -45,5 +28,10 @@ public abstract class BaseFormation : MonoBehaviour
         Vector3 endPos = _endPos.position;
 
         return new Vector3((startPos.x + endPos.x)/2, (startPos.y + endPos.y)/2, (startPos.z + endPos.z)/2);
+    }
+
+    public virtual void EndFormation(Group _group)
+    {
+        
     }
 }

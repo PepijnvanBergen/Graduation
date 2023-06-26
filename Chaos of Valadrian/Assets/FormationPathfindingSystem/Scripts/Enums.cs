@@ -26,3 +26,10 @@ public enum unitType
     indifferent,
     stupid
 }
+
+public enum formationType
+{
+    loose,
+    line,
+    circle
+}

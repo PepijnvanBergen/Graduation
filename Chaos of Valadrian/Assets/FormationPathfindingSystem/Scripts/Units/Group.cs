@@ -3,36 +3,43 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Group
+public class Group : MonoBehaviour
 {
+    public string name;
     public List<BaseUnit> units;
     public int teamInt;
-    public BaseFormation formation;
+    public BaseFormation currentFormation;
     public Group targetGroup;
     public bool attacking = false;
     private bool noTargets = true;
+    public float averageMorale;
     
     //Formation Positions
     public GameObject formationMaster;
-    public GameObject[,] formationPositions;
+    public Transform startPos;
+    public Transform endPos;
+    public List<GameObject> formationPositions = new List<GameObject>();
+
+    public UIGroupHolder uiHolder;
     
-    public Group(int _teamInt, List<BaseUnit> _units)
+
+    public void StartUp()
     {
-        teamInt = _teamInt;
-        units = _units;
-        foreach (Soldier s in _units)
+        foreach (Soldier s in units)
         {
             s.group = this;
         }
     }
-
     public void Execute()
     {
         foreach(BaseUnit unit in units)
         {
+            averageMorale += unit.morale;
             unit.FollowChoice();
         }
-
+        averageMorale /= units.Count;
+        
+        //uiHolder.ChangeVariables(name, averageMorale, currentFormation.thisFormation);
         //All the units are can move/do their action
     }
 
@@ -49,7 +56,7 @@ public class Group
                 }
 
                 s.attackTarget = temporaryDuplicate[0];
-                s.charge = true;
+                s.inCombat = true;
                 temporaryDuplicate.RemoveAt(0);
             }
             noTargets = false;

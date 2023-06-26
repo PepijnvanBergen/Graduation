@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using Unity.VisualScripting;
@@ -12,6 +13,7 @@ public class UnitManager : SerializedMonoBehaviour
 {
     [SerializeField] private ChoiceManager choiceManager;
     [SerializeField] private FormationManager formationManager;
+    [SerializeField] private UIGroupManager uiGroupManager;
     public bool spawnUnits = false;
     public bool newOrders = false;
     public int spawnAmmount = 1;
@@ -19,6 +21,7 @@ public class UnitManager : SerializedMonoBehaviour
     public GameObject unitPF;
     public float moveSpeed;
     public float health;
+    public float soldierStartMorale;
     
     public List<Soldier> soldiers = new List<Soldier>();
     private List<BaseUnit> workTeamList = new List<BaseUnit>();
@@ -72,7 +75,7 @@ public class UnitManager : SerializedMonoBehaviour
             workSoldier.unitType = unitType.indifferent;
             workSoldier.name = listLength + " Team " + teamInt;
             //workSoldier.name += " Team " + teamInt;
-            workSoldier.morale = 70;
+            workSoldier.morale = soldierStartMorale;
                 
             if (friendready == 2)
             {
@@ -100,14 +103,23 @@ public class UnitManager : SerializedMonoBehaviour
         }
         if (teams.ContainsKey(teamInt))
         {
-            teams[teamInt].units.AddRange(workTeamList);
+            teams[teamInt].units.AddRange(workTeamList);  
         }
         else
         {
-            teams.Add(teamInt, new Group(teamInt, workTeamList));
+            GameObject workGroup = Instantiate(new GameObject(), Vector3.zero, Quaternion.identity);
+            workGroup.AddComponent<Group>();
+            teams.Add(teamInt, workGroup.GetComponent<Group>());
+            
+            teams[teamInt].teamInt = teamInt;
+            teams[teamInt].units = workTeamList;
+            teams[teamInt].StartUp();
+            workGroup.name = teams[teamInt].name;
+            
             formationManager.StartDefaultFormation(teams[teamInt]);
+            uiGroupManager.AddGroup(teams[teamInt]);
+            //SendEvent add team to UI
         }
-        
     }
 
     public void Fight(Group _attackGroup, Group _defendGroup)

@@ -9,7 +9,7 @@ public class FollowOrdersChoice : BaseChoice
     public float moraleMultiplier = 1;
     public override void Action(Soldier _soldier)
     {
-        if (_soldier.charge)
+        if (_soldier.inCombat)
         {
             _soldier.MoveTowards(_soldier.attackTarget.transform.position);
         }

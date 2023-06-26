@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 726499421678433342}
   - component: {fileID: 8746456010660754844}
   - component: {fileID: 427311796660573143}
-  - component: {fileID: 6694402040219744890}
-  m_Layer: 0
+  - component: {fileID: 2483314276218387778}
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,7 +84,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6694402040219744890
+--- !u!65 &2483314276218387778
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,10 +92,10 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 486705993664891367}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.0000007, y: 1.0000006, z: 1.0000006}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1407611228884538184
 GameObject:
@@ -106,7 +106,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1382383818954117166}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FormationPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
