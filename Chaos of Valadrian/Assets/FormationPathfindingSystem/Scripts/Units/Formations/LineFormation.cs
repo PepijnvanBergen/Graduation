@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using Unity.VisualScripting;
 using UnityEngine;
-using System.Linq;
 public class LineFormation : BaseFormation
 {
     public GameObject[,] lineFormation;
@@ -33,6 +28,10 @@ public class LineFormation : BaseFormation
             if (unit.health < formationHealthImpact)
             {
                 unit.health = 1f;
+            }
+            else
+            {
+                unit.health -= formationHealthImpact;
             }
 
         }
@@ -73,13 +72,12 @@ public class LineFormation : BaseFormation
                 workFPos = lineFormation[x, y].AddComponent<FormationPos>();
                 workFPos.connectedUnit = _group.units[count];
                 _group.units[count].formationTarget = workFPos.gameObject;
-                _group.formationPositions.Add(lineFormation[x,y]);
-
-                //NewPos = ((y - middle) * distance) + formationMaster
+                _group.formationPositions.Add(lineFormation[x,y]); /////////////
+                
                 float calcValue = y;
                 // deze moet nu dus 0,0,0 zijn
                 Vector3 newPos = new Vector3((calcValue - (middle - 0.5f)) * _distanceBetweenUnits,
-                    _midPoint.y, (thicknessDistance * x));
+                    0, (thicknessDistance * x));
                 workFPos.ChangePos(newPos); //Dit werkt nog niet denk ik
 
                 count++;

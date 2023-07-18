@@ -1,12 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Group : MonoBehaviour
 {
     public string name;
-    public List<BaseUnit> units;
+    public List<Soldier> units = new List<Soldier>();
     public int teamInt;
     public BaseFormation currentFormation;
     public Group targetGroup;
@@ -21,6 +19,7 @@ public class Group : MonoBehaviour
     public List<GameObject> formationPositions = new List<GameObject>();
 
     public UIGroupHolder uiHolder;
+    public bool isEnemy;
     
 
     public void StartUp()
@@ -47,19 +46,26 @@ public class Group : MonoBehaviour
     {
         if (noTargets)
         {
-            List<BaseUnit> temporaryDuplicate = _targetGroup.units;
-            foreach (Soldier s in units)
+            for (int i = 0; i < units.Count; i++)
             {
-                if (temporaryDuplicate.Count == 0)
+                if (_targetGroup.units[i] == null)
                 {
-                    temporaryDuplicate = _targetGroup.units;
+                    units[i].attackTarget = _targetGroup.units[Random.Range(0, _targetGroup.units.Count)];
+                }
+                else
+                {
+                    units[i].attackTarget = _targetGroup.units[i];
                 }
 
-                s.attackTarget = temporaryDuplicate[0];
-                s.inCombat = true;
-                temporaryDuplicate.RemoveAt(0);
+                units[i].inCombat = true;
             }
             noTargets = false;
+        }
+
+        targetGroup = _targetGroup;
+        if (_targetGroup.targetGroup == null)
+        {
+            _targetGroup.Attack(this);
         }
     }
 }

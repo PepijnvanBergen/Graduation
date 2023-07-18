@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Policy;
 using UnityEngine;
 
 public class SaveFriendChoice : BaseChoice
@@ -8,12 +5,27 @@ public class SaveFriendChoice : BaseChoice
     [Header("Multipliers multiply the value by the multiplier amount before making the choice.")]
     public float friendDistanceMultiplier = 1;
     public float friendHPMultiplier = 1;
+    
+    public float attackRange;
     public override void Action(Soldier _soldier)
     {
         if (_soldier.inCombat)
         {
             _soldier.attackTarget = _soldier.friend.attackTarget;
-            _soldier.MoveTowards(_soldier.attackTarget.transform.position);
+
+
+            float distance = Vector3.Distance(_soldier.transform.position, _soldier.attackTarget.transform.position);
+            
+            if (distance < attackRange)
+            {
+                _soldier.Attack();
+                _soldier.agent.isStopped = true;
+            }
+            else
+            {
+                _soldier.inCombat = false;
+                _soldier.MoveTowards(_soldier.attackTarget.transform.position);
+            }
         }
         else
         {

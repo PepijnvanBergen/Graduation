@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using Sirenix.Utilities;
 
 public abstract class BaseFormation : MonoBehaviour
 {
@@ -32,6 +29,5 @@ public abstract class BaseFormation : MonoBehaviour
 
     public virtual void EndFormation(Group _group)
     {
-        
     }
 }

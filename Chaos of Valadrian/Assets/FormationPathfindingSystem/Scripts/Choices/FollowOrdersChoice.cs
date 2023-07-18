@@ -1,17 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 
 public class FollowOrdersChoice : BaseChoice
 {
     [Header("Multipliers multiply the value by the multiplier amount before making the choice.")]
     public float moraleMultiplier = 1;
+
+    public float attackRange;
     public override void Action(Soldier _soldier)
     {
         if (_soldier.inCombat)
         {
-            _soldier.MoveTowards(_soldier.attackTarget.transform.position);
+            //Debug.Log(_soldier.transform.gameObject.name + " Distance to target = " +Vector3.Distance(_soldier.transform.position, _soldier.attackTarget.transform.position));
+            if (Vector3.Distance(_soldier.transform.position, _soldier.attackTarget.transform.position) < attackRange)
+            {
+                _soldier.Attack();
+                _soldier.agent.isStopped = true;
+            }
+            else
+            {
+                _soldier.MoveTowards(_soldier.attackTarget.transform.position);
+            }
         }
         else
         {

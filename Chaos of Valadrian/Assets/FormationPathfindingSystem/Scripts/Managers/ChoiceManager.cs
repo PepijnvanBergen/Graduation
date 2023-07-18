@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 public class ChoiceManager : MonoBehaviour
 {
@@ -55,7 +52,9 @@ public class ChoiceManager : MonoBehaviour
                     }
                 }
             }
+            soldier.choice.ExitAction(soldier);
             soldier.choice = bestChoice;
+            soldier.choice.EnterAction(soldier);
         }
     }
 }

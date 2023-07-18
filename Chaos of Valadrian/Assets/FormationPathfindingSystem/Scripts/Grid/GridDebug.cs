@@ -160,7 +160,7 @@ public class GridDebug : MonoBehaviour
 
 				foreach (Node curNode in curGrid.nodeGrid)
 				{
-					Handles.Label(curNode.worldPoint, curNode.cost.ToString(), style);
+					//Handles.Label(curNode.worldPoint, curNode.cost.ToString(), style);
 				}
 
 				break;
@@ -169,7 +169,7 @@ public class GridDebug : MonoBehaviour
 
 				foreach (Node curNode in curGrid.nodeGrid)
 				{
-					Handles.Label(curNode.worldPoint, curNode.bestCost.ToString(), style);
+					//Handles.Label(curNode.worldPoint, curNode.bestCost.ToString(), style);
 				}
 
 				break;

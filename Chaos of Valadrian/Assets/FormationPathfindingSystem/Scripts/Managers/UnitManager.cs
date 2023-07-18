@@ -1,34 +1,33 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Palmmedia.ReportGenerator.Core.Reporting.Builders;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class UnitManager : SerializedMonoBehaviour
+public class UnitManager : MonoBehaviour
 {
     [SerializeField] private ChoiceManager choiceManager;
     [SerializeField] private FormationManager formationManager;
     [SerializeField] private UIGroupManager uiGroupManager;
-    public bool spawnUnits = false;
-    public bool newOrders = false;
-    public int spawnAmmount = 1;
     
-    public GameObject unitPF;
+    [SerializeField] private GameObject vikingPF;
+    [SerializeField] private GameObject romanPF;
+    
+    [Header("Add the two Transforms for each team in order of the teams")]
+    public Transform[] safeTeamPositions;
+    
+    public bool spawnUnits = false;
+    [Header("Make this an even number")]
+    public int spawnAmmount = 1;
+    public bool spawnEnemy;
+    
     public float moveSpeed;
     public float health;
     public float soldierStartMorale;
     
     public List<Soldier> soldiers = new List<Soldier>();
     private List<BaseUnit> workTeamList = new List<BaseUnit>();
-    [SerializeField] private int teamInt;
-    [OdinSerialize] private Dictionary<int, Group> teams = new Dictionary<int, Group>();
-    [Header("Add the two Transforms for each team in order of the teams")]
-    [SerializeField] private Transform[] safeTeamPositions;
+    public int teamInt;
+    public Dictionary<int, Group> teams = new Dictionary<int, Group>();
+
     public void Execute()
     {
         if (spawnUnits)
@@ -61,65 +60,88 @@ public class UnitManager : SerializedMonoBehaviour
     } //Not finished
     public void SpawnUnits()
     {
+        Group selectedGroup = null;
+        if (teams.ContainsKey(teamInt))
+        {
+            selectedGroup = teams[teamInt];
+        }
+        else
+        {
+            GameObject workGroup = Instantiate(new GameObject(), Vector3.zero, Quaternion.identity);
+            selectedGroup = workGroup.AddComponent<Group>();
+            teams.Add(teamInt, workGroup.GetComponent<Group>());
+            teams[teamInt].name = "group: " + teamInt;
+            teams[teamInt].teamInt = teamInt;
+            //L2 = L1.Select(x => x.Copy()).ToList();
+            //teams[teamInt].units = workTeamList.Select(x => x).ToList();
+            workGroup.name = teams[teamInt].name;
+        }
+        
         int friendready = 1;
         for (int s = 0; s < spawnAmmount; s++)
         {
             int listLength = soldiers.Count;
-                
+            GameObject workPF = null;
             spawnUnits = false;
-            GameObject workObj = Instantiate(unitPF, Vector3.zero, Quaternion.identity);
-            Soldier workSoldier = workObj.AddComponent<Soldier>();
+            if (teamInt == 1)
+            {
+                workPF = Instantiate(romanPF, CalculateSafePosition(safeTeamPositions[0],safeTeamPositions[1]), Quaternion.identity);
+            }else if (teamInt == 2)
+            {
+                workPF = Instantiate(vikingPF,  CalculateSafePosition(safeTeamPositions[2],safeTeamPositions[3]), Quaternion.identity);
+            }
+            Soldier workSoldier = workPF.AddComponent<Soldier>();
             workSoldier.agent = workSoldier.GetComponent<NavMeshAgent>();
             workSoldier.agent.speed = moveSpeed;
             workSoldier.health = health;
             workSoldier.unitType = unitType.indifferent;
+            workSoldier.minDistanceToTarget = 1f;
             workSoldier.name = listLength + " Team " + teamInt;
             //workSoldier.name += " Team " + teamInt;
             workSoldier.morale = soldierStartMorale;
-                
+
             if (friendready == 2)
             {
                 workSoldier.friend = soldiers[listLength - 1];
                 soldiers[listLength - 1].friend = workSoldier;
                 friendready = 0;
             }
-                
+
+            workSoldier.animator = workPF.GetComponent<Animator>();
             soldiers.Add(workSoldier);
-            workTeamList.Add((BaseUnit)workSoldier);
+            selectedGroup.units.Add((Soldier)workSoldier);
             choiceManager.GiveDefaultChoice(workSoldier);
             choiceManager.soldiers.Add(workSoldier);
+            if (spawnEnemy)
+            {
+                workSoldier.isEnemy = true;
+            }
 
             if (teamInt == 1)
             {
                 workSoldier.transform.position = CalculateSafePosition(safeTeamPositions[0], safeTeamPositions[1]);
+                workSoldier.safePosition = transform.position;
             } else if (teamInt == 2)
             {
                 workSoldier.transform.position = CalculateSafePosition(safeTeamPositions[2], safeTeamPositions[3]);
+                workSoldier.safePosition = transform.position;
             } else if (teamInt == 3)
             {
                 workSoldier.transform.position = CalculateSafePosition(safeTeamPositions[4], safeTeamPositions[5]);
+                workSoldier.safePosition = transform.position;
             }
             friendready++;
         }
-        if (teams.ContainsKey(teamInt))
+
+        if (spawnEnemy)
         {
-            teams[teamInt].units.AddRange(workTeamList);  
+            teams[teamInt].isEnemy = true;
         }
-        else
-        {
-            GameObject workGroup = Instantiate(new GameObject(), Vector3.zero, Quaternion.identity);
-            workGroup.AddComponent<Group>();
-            teams.Add(teamInt, workGroup.GetComponent<Group>());
-            
-            teams[teamInt].teamInt = teamInt;
-            teams[teamInt].units = workTeamList;
-            teams[teamInt].StartUp();
-            workGroup.name = teams[teamInt].name;
-            
-            formationManager.StartDefaultFormation(teams[teamInt]);
-            uiGroupManager.AddGroup(teams[teamInt]);
-            //SendEvent add team to UI
-        }
+        teams[teamInt].StartUp();
+        formationManager.StartDefaultFormation(teams[teamInt]);
+        uiGroupManager.AddGroup(teams[teamInt]);
+        
+        //workTeamList.Clear();
     }
 
     public void Fight(Group _attackGroup, Group _defendGroup)

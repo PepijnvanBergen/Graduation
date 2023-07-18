@@ -1,10 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class SystemManager : MonoBehaviour
 {
@@ -17,10 +11,14 @@ public class SystemManager : MonoBehaviour
     public Vector3 firstSelectionPoint;
     public Vector3 secondSelectionPoint;
     private bool firstPoint = false;
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask raycastLayers;
 
     public int newFormationTest;
 
+    private void Start()
+    {
+        SetUpLevel1();
+    }
     private void Update()
     {
         unitManager.Execute();
@@ -36,27 +34,69 @@ public class SystemManager : MonoBehaviour
             Ray ray;
             RaycastHit hitData;
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hitData, 1000))//,groundLayer))
+            Debug.DrawRay(ray.origin, ray.direction * 1000,Color.cyan, 5f);
+            if (Physics.Raycast(ray, out hitData, 1000,raycastLayers))
+            {
+                foreach (Soldier soldier in unitManager.soldiers)
                 {
-                    Debug.Log(hitData.collider.gameObject.name);
-                    if (hitData.collider.gameObject.CompareTag("Soldier"))
+                    if (Vector3.Distance(soldier.transform.position, hitData.point) < 2f)
                     {
-                        hitData.collider.GetComponent<Soldier>().group.uiHolder.MakeThisSelectedGroup();
-                        Debug.Log("new group selected");
-                    }
+                        if (soldier.isEnemy)
+                        {
+                            uIgroupManager.selectedGroup.group.Attack(soldier.group);
+                            Debug.Log("Attack");
+                            return;
+                        }
+                        soldier.group.uiHolder.MakeThisSelectedGroup();
+                        Debug.Log(soldier.group + " is new selected group");
 
-                    if (hitData.collider.name == "Ground")
-                    {
-                        firstSelectionPoint = hitData.point;
-                        firstPoint = true;
                     }
                 }
+                
+                
+                // Collider[] colliders = Physics.OverlapSphere(hitData.point, 1f, raycastLayers);
+                //  foreach (var collider in colliders)
+                // {
+                //     Debug.Log(collider.gameObject.name);
+                //     Soldier testSoldier = hitData.collider.GetComponent<Soldier>();
+                //     if (testSoldier != null)
+                //     {
+                //
+                //
+                //         return;
+                //     }
+                // }
+
+                    // if (hitData.collider.gameObject.CompareTag("Soldier"))
+                    // {
+                    //     if (hitData.collider.GetComponent<Soldier>().isEnemy)
+                    //     {
+                    //         uIgroupManager.selectedGroup.group.Attack(hitData.collider.GetComponent<Soldier>().group);
+                    //         Debug.Log("Attack");
+                    //         return;
+                    //     }
+                    //     hitData.collider.GetComponent<Soldier>().group.uiHolder.MakeThisSelectedGroup();
+                    //     Debug.Log("new group selected");
+                    // }
+                    
+                        firstSelectionPoint = hitData.point;
+                        firstPoint = true;
+            }
+
+            if (Input.GetKey(KeyCode.H))
+            {
+                foreach (Soldier soldier in uIgroupManager.selectedGroup.group.units)
+                {
+                    soldier.morale += 20f;
+                }
+            }
+            
         }
         if (Input.GetMouseButtonUp(0) && firstPoint)
         {
             Ray ray;
             RaycastHit hitData;
-            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition); //swap with cam?
             if (Physics.Raycast(ray, out hitData, 1000))//,groundLayer))
             {
                 if (hitData.collider.gameObject.layer == 5)
@@ -72,11 +112,6 @@ public class SystemManager : MonoBehaviour
                 }
 
                 firstPoint = false;
-            }
-
-            if (uIgroupManager.selectedGroup != null)
-            {
-                //formationManager.;
             }
         }
     }
@@ -95,4 +130,18 @@ public class SystemManager : MonoBehaviour
             formationManager.ChangeFormation(formationManager.formations[2], _group);
         }
     }
+
+    public void SetUpLevel1()
+    {
+        unitManager.teamInt = 1;
+        unitManager.spawnEnemy = false;
+        unitManager.SpawnUnits();
+        formationManager.MoveFormation(unitManager.teams[1], unitManager.safeTeamPositions[0].position, unitManager.safeTeamPositions[1].position);
+        
+        unitManager.teamInt = 2;
+        unitManager.spawnEnemy = true;
+        unitManager.SpawnUnits();
+        
+        formationManager.MoveFormation(unitManager.teams[2], unitManager.safeTeamPositions[2].position, unitManager.safeTeamPositions[3].position);
+      }
 }

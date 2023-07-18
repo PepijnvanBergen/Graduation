@@ -1,15 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Sirenix.Utilities;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CircleFormation : BaseFormation
 {
     public float formationMoraleImpact = 20f;
-    public float baseRadius = 7f;
     public float maxRadius;
+    public float minRadius;
     public float maxPerCircle;
     public override void StartFormation(Group _group)
     {
@@ -42,6 +38,8 @@ public class CircleFormation : BaseFormation
         if(!_group.startPos) _group.startPos = Instantiate(startPos, startPos.transform.position, Quaternion.identity);
         if(!_group.endPos) _group.endPos = Instantiate(endPos, endPos.transform.position, Quaternion.identity);
         float radius = Vector3.Distance(startPos.position, endPos.position) / 2;
+        if (radius > maxRadius) radius = maxRadius;
+        if (radius < minRadius) radius = minRadius;
         MakeCircle(_group, radius);
     }
 
